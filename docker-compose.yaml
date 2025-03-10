@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    platform: linux/amd64
+    container_name: app
+    image: chenow/gourmitton
