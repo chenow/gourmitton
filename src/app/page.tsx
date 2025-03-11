@@ -21,85 +21,40 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useRecipes } from "@/hooks/useRecipes";
+import { Recipe } from "@/types/Recipe";
 import Image from "next/image";
 
-// Données mockées pour l'affichage (à remplacer par les données de l'API)
-const mockRecipes = [
-  {
-    id: 1,
-    title: "Pasta Carbonara",
-    description:
-      "Une recette italienne classique avec des œufs, du fromage et du bacon.",
-    image:
-      "https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=800&auto=format&fit=crop",
-    duration: "30 min",
-    difficulty: "Facile",
-    tags: ["Italien", "Pâtes"],
-  },
-  {
-    id: 2,
-    title: "Ratatouille",
-    description:
-      "Un plat provençal de légumes mijotés avec des herbes aromatiques.",
-    image:
-      "https://images.unsplash.com/photo-1572453800999-e8d2d1589b7c?w=800&auto=format&fit=crop",
-    duration: "45 min",
-    difficulty: "Moyen",
-    tags: ["Français", "Végétarien"],
-  },
-  {
-    id: 3,
-    title: "Poulet rôti aux herbes",
-    description:
-      "Poulet entier rôti avec un mélange d'herbes fraîches et d'ail.",
-    image:
-      "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=800&auto=format&fit=crop",
-    duration: "1h30",
-    difficulty: "Moyen",
-    tags: ["Viande", "Dîner"],
-  },
-  {
-    id: 4,
-    title: "Salade niçoise",
-    description: "Salade composée avec thon, œufs, olives et légumes frais.",
-    image:
-      "https://images.unsplash.com/photo-1594834749740-74b3f6764be4?w=800&auto=format&fit=crop",
-    duration: "20 min",
-    difficulty: "Facile",
-    tags: ["Français", "Salade", "Léger"],
-  },
-  {
-    id: 5,
-    title: "Lasagnes bolognaise",
-    description:
-      "Couches de pâtes, sauce bolognaise et béchamel gratinées au four.",
-    image:
-      "https://images.unsplash.com/photo-1619895092538-128341789043?w=800&auto=format&fit=crop",
-    duration: "2h",
-    difficulty: "Difficile",
-    tags: ["Italien", "Pâtes", "Four"],
-  },
-  {
-    id: 6,
-    title: "Soupe miso",
-    description: "Bouillon japonais traditionnel avec tofu, algues et légumes.",
-    image:
-      "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop",
-    duration: "25 min",
-    difficulty: "Facile",
-    tags: ["Japonais", "Soupe"],
-  },
-];
-
 export default function HomePage() {
+  const { data: recipes, isLoading, error } = useRecipes();
+
+  // Fonction pour extraire des tags à partir de la description (exemple simple)
+  const extractTags = (recipe: Recipe) => {
+    // Cette fonction est un exemple - vous pourriez vouloir implémenter une logique plus robuste
+    // pour extraire des tags cohérents ou avoir des tags réels dans votre API
+    const tags = [];
+
+    // Ajouter un tag basé sur when_to_eat
+    if (recipe.when_to_eat === "dish") tags.push("Plat principal");
+    if (recipe.when_to_eat === "dessert") tags.push("Dessert");
+
+    // Ajouter un tag basé sur le temps de préparation
+    if (recipe.prep_time + recipe.cook_time <= 15) tags.push("Rapide");
+    else if (recipe.prep_time + recipe.cook_time >= 30)
+      tags.push("Longue préparation");
+
+    // Vous pouvez ajouter d'autres logiques pour extraire des tags
+
+    return tags.length ? tags : ["Divers"];
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header avec navigation */}
       <header className="border-b bg-card">
-        <div className="mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="mx-auto px-8 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-primary">Gourmet</h1>
-
             <nav className="hidden md:flex space-x-4">
               <Link
                 href="/"
@@ -181,13 +136,10 @@ export default function HomePage() {
             Tous
           </Badge>
           <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-            Italien
+            Plat principal
           </Badge>
           <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-            Français
-          </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-            Végétarien
+            Dessert
           </Badge>
           <Badge variant="outline" className="cursor-pointer hover:bg-accent">
             Rapide
@@ -197,58 +149,82 @@ export default function HomePage() {
 
       {/* Liste des recettes */}
       <div className="container mx-auto px-4 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockRecipes.map((recipe) => (
-            <Link href={`/recettes/${recipe.id}`} key={recipe.id}>
-              <Card className="pt-0 h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <div className="aspect-video w-full overflow-hidden bg-muted">
-                  {recipe.image ? (
-                    <Image
-                      src={recipe.image}
-                      alt={recipe.title}
-                      height={800}
-                      width={400}
-                      className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-muted">
-                      <span className="text-muted-foreground">
-                        Pas d&apos;image
-                      </span>
-                    </div>
-                  )}
-                </div>
+        {isLoading && (
+          <div className="flex justify-center py-12">
+            <div className="loader">Chargement des recettes...</div>
+          </div>
+        )}
 
-                <CardHeader className="pb-2">
-                  <CardTitle className="line-clamp-1">{recipe.title}</CardTitle>
-                </CardHeader>
+        {error && (
+          <div className="bg-destructive/10 text-destructive p-4 rounded-md">
+            Une erreur s&apos;est produite lors du chargement des recettes.
+          </div>
+        )}
 
-                <CardContent className="pb-2">
-                  <p className="text-muted-foreground text-sm line-clamp-2">
-                    {recipe.description}
-                  </p>
-
-                  <div className="flex gap-2 mt-3">
-                    {recipe.tags.map((tag, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="text-xs"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
+        {recipes && recipes.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recipes.map((recipe) => (
+              <Link href={`/recettes/${recipe.id}`} key={recipe.id}>
+                <Card className="h-full pt-0 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <div className="aspect-video w-full overflow-hidden bg-muted">
+                    {recipe.image_url ? (
+                      <Image
+                        height={200}
+                        width={300}
+                        src={recipe.image_url}
+                        alt={recipe.name}
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-muted">
+                        <span className="text-muted-foreground">
+                          Pas d&apos;image
+                        </span>
+                      </div>
+                    )}
                   </div>
-                </CardContent>
 
-                <CardFooter className="flex justify-between text-sm text-muted-foreground">
-                  <span>{recipe.duration}</span>
-                  <span>Difficulté: {recipe.difficulty}</span>
-                </CardFooter>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                  <CardHeader className="pb-2">
+                    <CardTitle>{recipe.name}</CardTitle>
+                  </CardHeader>
+
+                  <CardContent className="pb-2">
+                    <p className="text-muted-foreground text-sm line-clamp-2">
+                      {recipe.description}
+                    </p>
+
+                    <div className="flex gap-2 mt-3">
+                      {extractTags(recipe).map((tag, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="text-xs"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+
+                  <CardFooter className="flex justify-between text-sm text-muted-foreground">
+                    <span>{recipe.prep_time + recipe.cook_time} min</span>
+                    <span>
+                      Difficulté: {recipe.prep_time > 15 ? "Moyen" : "Facile"}
+                    </span>
+                  </CardFooter>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {recipes && recipes.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              Aucune recette disponible pour le moment.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
