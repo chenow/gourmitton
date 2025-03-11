@@ -20,6 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Image from "next/image";
 
 // Données mockées pour l'affichage (à remplacer par les données de l'API)
@@ -92,23 +93,23 @@ const mockRecipes = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header avec navigation */}
-      <header className="bg-white shadow">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <header className="border-b bg-card">
+        <div className="mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-indigo-600">Gourmet</h1>
+            <h1 className="text-2xl font-bold text-primary">Gourmet</h1>
 
             <nav className="hidden md:flex space-x-4">
               <Link
                 href="/"
-                className="font-medium text-gray-900 hover:text-indigo-600"
+                className="font-medium text-foreground hover:text-primary"
               >
                 Accueil
               </Link>
               <Link
                 href="/favorites"
-                className="font-medium text-gray-500 hover:text-indigo-600"
+                className="font-medium text-muted-foreground hover:text-primary"
               >
                 Mes favoris
               </Link>
@@ -117,13 +118,15 @@ export default function HomePage() {
 
           <div className="flex items-center space-x-4">
             <div className="relative w-64 hidden md:block">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Rechercher une recette..."
                 className="pl-8"
               />
             </div>
+
+            <ThemeToggle />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -133,7 +136,7 @@ export default function HomePage() {
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="" alt="Photo de profil" />
-                    <AvatarFallback className="bg-indigo-100 text-indigo-700">
+                    <AvatarFallback className="bg-primary/10 text-primary">
                       UT
                     </AvatarFallback>
                   </Avatar>
@@ -151,7 +154,7 @@ export default function HomePage() {
       {/* Barre de recherche mobile */}
       <div className="container mx-auto px-4 py-4 md:hidden">
         <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Rechercher une recette..."
@@ -162,10 +165,10 @@ export default function HomePage() {
 
       {/* Titre de la page */}
       <div className="container mx-auto px-4 pt-8 pb-6">
-        <h2 className="text-3xl font-bold text-gray-900">
+        <h2 className="text-3xl font-bold text-foreground">
           Toutes les recettes
         </h2>
-        <p className="text-gray-600 mt-2">
+        <p className="text-muted-foreground mt-2">
           Découvrez notre collection de délicieuses recettes préparées par nos
           chefs.
         </p>
@@ -174,19 +177,19 @@ export default function HomePage() {
       {/* Filtres */}
       <div className="container mx-auto px-4 pb-6">
         <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
+          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
             Tous
           </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
+          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
             Italien
           </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
+          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
             Français
           </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
+          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
             Végétarien
           </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
+          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
             Rapide
           </Badge>
         </div>
@@ -197,19 +200,21 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {mockRecipes.map((recipe) => (
             <Link href={`/recettes/${recipe.id}`} key={recipe.id}>
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <div className="aspect-video w-full overflow-hidden bg-gray-100">
+              <Card className="pt-0 h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className="aspect-video w-full overflow-hidden bg-muted">
                   {recipe.image ? (
                     <Image
                       src={recipe.image}
                       alt={recipe.title}
-                      width={800}
-                      height={450}
+                      height={800}
+                      width={400}
                       className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-gray-100">
-                      <span className="text-gray-400">Pas d&apos;image</span>
+                    <div className="flex h-full items-center justify-center bg-muted">
+                      <span className="text-muted-foreground">
+                        Pas d&apos;image
+                      </span>
                     </div>
                   )}
                 </div>
@@ -219,7 +224,7 @@ export default function HomePage() {
                 </CardHeader>
 
                 <CardContent className="pb-2">
-                  <p className="text-gray-600 text-sm line-clamp-2">
+                  <p className="text-muted-foreground text-sm line-clamp-2">
                     {recipe.description}
                   </p>
 
@@ -236,7 +241,7 @@ export default function HomePage() {
                   </div>
                 </CardContent>
 
-                <CardFooter className="flex justify-between text-sm text-gray-500">
+                <CardFooter className="flex justify-between text-sm text-muted-foreground">
                   <span>{recipe.duration}</span>
                   <span>Difficulté: {recipe.difficulty}</span>
                 </CardFooter>
