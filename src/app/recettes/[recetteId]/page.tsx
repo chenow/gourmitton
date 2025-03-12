@@ -17,6 +17,7 @@ import {
   User,
   AlertCircle,
   ArrowLeft,
+  Heart,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -25,6 +26,55 @@ import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "sonner";
+import { RecipeLike } from "@/types/Recipe";
+
+// Assume these are defined elsewhere in your application
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
+
+const likeRecipe = async (recipeId: string, username: string) => {
+  const response = await axios.post<RecipeLike>(
+    `${API_BASE_URL}/users/${username}/favorites`,
+    { recipe_id: recipeId },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+const unlikeRecipe = async (recipeId: string, username: string) => {
+  const response = await axios.delete(
+    `${API_BASE_URL}/users/${username}/favorites/${recipeId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+const checkIfLiked = async (recipeId: string, username: string) => {
+  try {
+    const response = await axios.get<RecipeLike[]>(
+      `${API_BASE_URL}/users/${username}/favorites`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data.some((like) => like.recipe_id === recipeId);
+  } catch (error) {
+    console.error("Error checking if recipe is liked:", error);
+    return false;
+  }
+};
 
 export default function RecettePage() {
   const { recetteId } = useParams();
@@ -33,6 +83,62 @@ export default function RecettePage() {
     isLoading,
     error,
   } = useRecipe(Array.isArray(recetteId) ? recetteId[0] : recetteId);
+
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    const storedUsername = localStorage.getItem("username");
+
+    if (token && storedUsername) {
+      setIsLoggedIn(true);
+      setUsername(storedUsername);
+
+      // If we have a recipe and the user is logged in, check if it's liked
+      if (recipe && recipe.id) {
+        setIsLikeLoading(true);
+        checkIfLiked(recipe.id, storedUsername)
+          .then((liked) => {
+            setIsLiked(liked);
+          })
+          .finally(() => {
+            setIsLikeLoading(false);
+          });
+      }
+    }
+  }, [recipe]);
+
+  const handleToggleLike = async () => {
+    console.log("handleToggleLike");
+    toast("Connectez-vous pour ajouter des recettes à vos favoris");
+
+    if (!isLoggedIn || !username || !recipe) {
+      toast("Connectez-vous pour ajouter des recettes à vos favoris");
+      return;
+    }
+
+    setIsLikeLoading(true);
+    try {
+      if (isLiked) {
+        await unlikeRecipe(recipe.id, username);
+        setIsLiked(false);
+        toast("La recette a été retirée de vos favoris");
+      } else {
+        await likeRecipe(recipe.id, username);
+        setIsLiked(true);
+        toast("La recette a été ajoutée à vos favoris");
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setIsLikeLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -85,13 +191,33 @@ export default function RecettePage() {
                 {recipe.description}
               </CardDescription>
             </div>
-            <Badge
-              variant={
-                recipe.when_to_eat === "dessert" ? "secondary" : "default"
-              }
-            >
-              {recipe.when_to_eat === "dessert" ? "Dessert" : "Plat principal"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                disabled={isLikeLoading}
+                className={
+                  isLiked
+                    ? "text-red-500 hover:text-red-600"
+                    : "text-muted-foreground hover:text-red-400"
+                }
+                title={isLiked ? "Retirer des favoris" : "Ajouter aux favoris"}
+              >
+                <Heart
+                  onClick={handleToggleLike}
+                  className={`h-6 w-6 ${isLiked ? "fill-current" : ""}`}
+                />
+              </Button>
+              <Badge
+                variant={
+                  recipe.when_to_eat === "dessert" ? "secondary" : "default"
+                }
+              >
+                {recipe.when_to_eat === "dessert"
+                  ? "Dessert"
+                  : "Plat principal"}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
 

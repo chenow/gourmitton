@@ -16,3 +16,9 @@ export interface Recipe {
   disclaimer: string;
   when_to_eat: "dish" | "dessert" | string;
 }
+
+export interface RecipeLike {
+  created_at: string;
+  recipe_id: string;
+  username: string;
+}

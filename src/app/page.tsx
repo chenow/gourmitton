@@ -2,9 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,15 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { useRecipes } from "@/hooks/useRecipes";
 import { Recipe } from "@/types/Recipe";
 import Image from "next/image";
@@ -49,75 +38,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header avec navigation */}
-      <header className="border-b bg-card">
-        <div className="mx-auto px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-primary">Gourmet</h1>
-            <nav className="hidden md:flex space-x-4">
-              <Link
-                href="/"
-                className="font-medium text-foreground hover:text-primary"
-              >
-                Accueil
-              </Link>
-              <Link
-                href="/favorites"
-                className="font-medium text-muted-foreground hover:text-primary"
-              >
-                Mes favoris
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <div className="relative w-64 hidden md:block">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Rechercher une recette..."
-                className="pl-8"
-              />
-            </div>
-
-            <ThemeToggle />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt="Photo de profil" />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      UT
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Mon profil</DropdownMenuItem>
-                <DropdownMenuItem>Se déconnecter</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
-
-      {/* Barre de recherche mobile */}
-      <div className="container mx-auto px-4 py-4 md:hidden">
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Rechercher une recette..."
-            className="pl-8 w-full"
-          />
-        </div>
-      </div>
-
+    <div>
       {/* Titre de la page */}
       <div className="container mx-auto px-4 pt-8 pb-6">
         <h2 className="text-3xl font-bold text-foreground">
@@ -127,24 +48,6 @@ export default function HomePage() {
           Découvrez notre collection de délicieuses recettes préparées par nos
           chefs.
         </p>
-      </div>
-
-      {/* Filtres */}
-      <div className="container mx-auto px-4 pb-6">
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-            Tous
-          </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-            Plat principal
-          </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-            Dessert
-          </Badge>
-          <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-            Rapide
-          </Badge>
-        </div>
       </div>
 
       {/* Liste des recettes */}
@@ -169,6 +72,7 @@ export default function HomePage() {
                   <div className="aspect-video w-full overflow-hidden bg-muted">
                     {recipe.image_url ? (
                       <Image
+                        priority
                         height={200}
                         width={300}
                         src={recipe.image_url}
