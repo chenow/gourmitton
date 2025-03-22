@@ -33,7 +33,7 @@ export default function FavoritesPage() {
 
   const handleRemoveFavorite = (recipeId: string) => {
     removeFavorite.mutate(
-      { recipeId, username: user.username },
+      { recipeId, username: user!.username },
       {
         onSuccess: () => {
           toast("Recipe removed from favorites");
