@@ -1,7 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useRecipe } from "@/hooks/useRecipes";
+import { useRecipe } from "@/hooks/recipes";
+import {
+  useAddFavorite,
+  useRemoveFavorite,
+  useIsFavorite,
+} from "@/hooks/favorites";
 import {
   Card,
   CardContent,
@@ -18,6 +23,7 @@ import {
   AlertCircle,
   ArrowLeft,
   Heart,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -26,118 +32,58 @@ import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "sonner";
-import { RecipeLike } from "@/types/Recipe";
-
-// Assume these are defined elsewhere in your application
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
-
-const likeRecipe = async (recipeId: string, username: string) => {
-  const response = await axios.post<RecipeLike>(
-    `${API_BASE_URL}/users/${username}/favorites`,
-    { recipe_id: recipeId },
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-  );
-  return response.data;
-};
-
-const unlikeRecipe = async (recipeId: string, username: string) => {
-  const response = await axios.delete(
-    `${API_BASE_URL}/users/${username}/favorites/${recipeId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-  );
-  return response.data;
-};
-
-const checkIfLiked = async (recipeId: string, username: string) => {
-  try {
-    const response = await axios.get<RecipeLike[]>(
-      `${API_BASE_URL}/users/${username}/favorites`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    return response.data.some((like) => like.recipe_id === recipeId);
-  } catch (error) {
-    console.error("Error checking if recipe is liked:", error);
-    return false;
-  }
-};
+import { useAuth } from "@/context/authContext";
 
 export default function RecettePage() {
   const { recetteId } = useParams();
-  const {
-    data: recipe,
-    isLoading,
-    error,
-  } = useRecipe(Array.isArray(recetteId) ? recetteId[0] : recetteId);
+  const id = Array.isArray(recetteId) ? recetteId[0] : recetteId!;
 
-  const [isLiked, setIsLiked] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
-  const [isLikeLoading, setIsLikeLoading] = useState(false);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem("token");
-    const storedUsername = localStorage.getItem("username");
+  const { data: recette, isLoading, error } = useRecipe(id);
+  const [isFavorite, setIsFavorite] = useIsFavorite(id);
 
-    if (token && storedUsername) {
-      setIsLoggedIn(true);
-      setUsername(storedUsername);
+  const addFavorite = useAddFavorite();
+  const removeFavorite = useRemoveFavorite();
 
-      // If we have a recipe and the user is logged in, check if it's liked
-      if (recipe && recipe.id) {
-        setIsLikeLoading(true);
-        checkIfLiked(recipe.id, storedUsername)
-          .then((liked) => {
-            setIsLiked(liked);
-          })
-          .finally(() => {
-            setIsLikeLoading(false);
-          });
-      }
-    }
-  }, [recipe]);
-
-  const handleToggleLike = async () => {
-    console.log("handleToggleLike");
-    toast("Connectez-vous pour ajouter des recettes à vos favoris");
-
-    if (!isLoggedIn || !username || !recipe) {
+  const handleToggleFavorite = async () => {
+    if (!user || !user.username || !recette) {
       toast("Connectez-vous pour ajouter des recettes à vos favoris");
       return;
     }
 
-    setIsLikeLoading(true);
-    try {
-      if (isLiked) {
-        await unlikeRecipe(recipe.id, username);
-        setIsLiked(false);
-        toast("La recette a été retirée de vos favoris");
-      } else {
-        await likeRecipe(recipe.id, username);
-        setIsLiked(true);
-        toast("La recette a été ajoutée à vos favoris");
-      }
-    } catch (error) {
-      console.error("Error toggling like:", error);
-      toast("Une erreur est survenue. Veuillez réessayer.");
-    } finally {
-      setIsLikeLoading(false);
+    if (isFavorite) {
+      // Supprimer des favoris
+      removeFavorite.mutate(
+        { recipeId: recette.id, username: user.username },
+        {
+          onSuccess: () => {
+            toast("La recette a été retirée de vos favoris");
+          },
+          onError: () => {
+            toast("Une erreur est survenue. Veuillez réessayer.");
+          },
+        }
+      );
+    } else {
+      // Ajouter aux favoris
+      addFavorite.mutate(
+        {
+          recipeId: recette.id,
+          username: user.username,
+        },
+        {
+          onSuccess: () => {
+            toast("La recette a été ajoutée à vos favoris");
+          },
+          onError: () => {
+            toast("Une erreur est survenue. Veuillez réessayer.");
+          },
+        }
+      );
     }
+    setIsFavorite(!isFavorite);
   };
 
   if (isLoading) {
@@ -148,7 +94,7 @@ export default function RecettePage() {
     );
   }
 
-  if (error || !recipe) {
+  if (error || !recette) {
     return (
       <div className="container mx-auto mt-8">
         <Alert variant="destructive">
@@ -169,6 +115,8 @@ export default function RecettePage() {
     );
   }
 
+  const isLikeLoading = addFavorite.isPending || removeFavorite.isPending;
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-4">
@@ -185,10 +133,10 @@ export default function RecettePage() {
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-3xl font-bold">
-                {recipe.name}
+                {recette.name}
               </CardTitle>
               <CardDescription className="text-lg mt-2">
-                {recipe.description}
+                {recette.description}
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -196,24 +144,30 @@ export default function RecettePage() {
                 variant="ghost"
                 size="icon"
                 disabled={isLikeLoading}
+                onClick={handleToggleFavorite}
                 className={
-                  isLiked
+                  isFavorite
                     ? "text-red-500 hover:text-red-600"
                     : "text-muted-foreground hover:text-red-400"
                 }
-                title={isLiked ? "Retirer des favoris" : "Ajouter aux favoris"}
+                title={
+                  isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"
+                }
               >
-                <Heart
-                  onClick={handleToggleLike}
-                  className={`h-6 w-6 ${isLiked ? "fill-current" : ""}`}
-                />
+                {isLikeLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  <Heart
+                    className={`h-6 w-6 ${isFavorite ? "fill-current" : ""}`}
+                  />
+                )}
               </Button>
               <Badge
                 variant={
-                  recipe.when_to_eat === "dessert" ? "secondary" : "default"
+                  recette.when_to_eat === "dessert" ? "secondary" : "default"
                 }
               >
-                {recipe.when_to_eat === "dessert"
+                {recette.when_to_eat === "dessert"
                   ? "Dessert"
                   : "Plat principal"}
               </Badge>
@@ -221,12 +175,12 @@ export default function RecettePage() {
           </div>
         </CardHeader>
 
-        {recipe.image_url && (
+        {recette.image_url && (
           <div className="relative w-full h-64 sm:h-80 lg:h-96 overflow-hidden">
             <Image
               fill
-              src={recipe.image_url}
-              alt={recipe.name}
+              src={recette.image_url}
+              alt={recette.name}
               className="object-cover w-full h-full"
             />
           </div>
@@ -237,18 +191,18 @@ export default function RecettePage() {
             <div className="flex flex-col items-center text-center">
               <Clock className="mb-1 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Préparation</span>
-              <span className="font-medium">{recipe.prep_time} min</span>
+              <span className="font-medium">{recette.prep_time} min</span>
             </div>
             <div className="flex flex-col items-center text-center">
               <Flame className="mb-1 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Cuisson</span>
-              <span className="font-medium">{recipe.cook_time} min</span>
+              <span className="font-medium">{recette.cook_time} min</span>
             </div>
             <div className="flex flex-col items-center text-center">
               <CalendarDays className="mb-1 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Créée le</span>
               <span className="font-medium">
-                {new Date(recipe.created_at).toLocaleDateString("fr-FR")}
+                {new Date(recette.created_at).toLocaleDateString("fr-FR")}
               </span>
             </div>
           </div>
@@ -257,13 +211,13 @@ export default function RecettePage() {
 
           <h3 className="text-xl font-semibold mb-3">Instructions</h3>
           <div className="prose max-w-none">
-            <ReactMarkdown>{recipe.instructions}</ReactMarkdown>
+            <ReactMarkdown>{recette.instructions}</ReactMarkdown>
           </div>
 
-          {recipe.disclaimer && (
+          {recette.disclaimer && (
             <Alert className="mt-6">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{recipe.disclaimer}</AlertDescription>
+              <AlertDescription>{recette.disclaimer}</AlertDescription>
             </Alert>
           )}
         </CardContent>
@@ -271,9 +225,9 @@ export default function RecettePage() {
         <CardFooter className="flex justify-between pt-4">
           <div className="text-sm text-muted-foreground flex items-center">
             <User className="h-4 w-4 mr-1" />
-            Créée par {recipe.created_by}
+            Créée par {recette.created_by}
           </div>
-          {recipe.published === false && (
+          {recette.published === false && (
             <Badge
               variant="outline"
               className="bg-yellow-100 text-yellow-800 border-yellow-200"

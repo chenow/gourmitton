@@ -9,13 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
-export interface User {
-  username: string;
-  full_name: string;
-  email: string;
-  created_at: string;
-}
+import { User } from "@/types";
 
 // Define the authentication context type
 interface AuthContextType {

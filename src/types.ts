@@ -1,3 +1,10 @@
+export interface User {
+  username: string;
+  full_name: string;
+  email: string;
+  created_at: string;
+}
+
 export interface Recipe {
   id: string;
   created_at: string;
@@ -14,7 +21,7 @@ export interface Recipe {
   servings: number;
   image_url: string;
   disclaimer: string;
-  when_to_eat: "dish" | "dessert" | string;
+  when_to_eat: string;
 }
 
 export interface RecipeLike {

@@ -10,8 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useRecipes } from "@/hooks/useRecipes";
-import { Recipe } from "@/types/Recipe";
+import { useRecipes } from "@/hooks/recipes";
+import { Recipe } from "@/types";
 import Image from "next/image";
 
 export default function HomePage() {
