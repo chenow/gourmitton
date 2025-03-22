@@ -3,6 +3,7 @@ FROM oven/bun:1.2.5-alpine AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
+ENV  NEXT_PUBLIC_API_BASE_URL https://gourmet.cours.quimerch.com
 
 # Install dependencies only when needed
 FROM base AS deps
