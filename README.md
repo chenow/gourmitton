@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍽️ Gourmitton Recipe Manager
 
-## Getting Started
+A modern web application for managing your favorite recipes, built with Next.js, React, TypeScript, and shadcn/ui.
 
-First, run the development server:
+![Bun Logo](https://img.shields.io/badge/Bun-FDFAF6?style=for-the-badge&logo=bun&logoColor=CBA35C)
+![Nextjs Logo](https://img.shields.io/badge/Nextjs-000000?style=for-the-badge&logo=nextjs&logoColor=white)
+![Docker Logo](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
+
+![CI - Linter](https://github.com/chenow/gourmitton/actions/workflows/lint.yaml/badge.svg)
+
+
+## ✨ Features
+
+- 📋 Browse all available recipes
+- 🔍 View detailed recipe information
+- 👤 User authentication (login/logout)
+- ❤️ Save your favorite recipes
+- 📱 Responsive design for all devices
+- 🔒 Secure API integration
+- 🎨 Beautiful UI with shadcn components
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [https://bun.sh/](Bun)
+- Docker (optional, for containerized deployment)
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+git clone git@github.com:chenow/gourmitton.git
+cd gourmitton
+```
+
+2. Install dependencies:
+
+```bash
+bun install
+```
+
+1. Create a `.env` file in the root directory with the following variables:
+
+```
+NEXT_PUBLIC_API_BASE_URL = "https://gourmet.cours.quimerch.com"
+```
+
+4. Start the development server:
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🏗️ Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+Gourmitton/src/
+├── app/               # Next.js pages and routing
+│   ├── /                 # Home page (recipe list)
+│   ├── recettes/[id]/    # Individual recipe page
+│   └── favorites/        # User's favorite recipes
+├── components/           # Reusable UI components
+│   ├── /                 # Reusable components
+│   └── ui/               # shadcn UI components
+├── context/              # React Context providers
+│   └── authContext.tsx   # Authentication context
+├── hooks/                # Custom React hooks
+│   ├── favorites.ts      # Favorites management hooks
+│   └── recipes.ts        # Recipe data fetching hooks
+├── providers/            # Provider components
+│   └── ReactQueryProvider.tsx # React Query configuration
+├── public/               # Static assets
+└── types.ts              # TypeScript type definitions
+```
 
-## Learn More
+## 🧩 Architecture
 
-To learn more about Next.js, take a look at the following resources:
+This project follows a modern React architecture with Next.js, leveraging the power of server-side rendering and static site generation where appropriate.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Key Technologies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Next.js**: For server-side rendering, routing, and API routes
+- **React**: UI library for building the user interface
+- **TypeScript**: Static typing for better developer experience
+- **shadcn/ui**: High-quality UI components
+- **React Query**: Data fetching, caching, and state management
+- **Context API**: For managing application state like authentication
 
-## Deploy on Vercel
+## 🐳 Docker Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Build and run the Docker container:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+docker compose up --build
+```
+
+## 🧪 Lint
+
+Run lints with
+
+```bash
+bun lint
+```
+
+## 🌐 API Integration
+
+This application connects to the Gourmet API:
+- Base URL: https://gourmet.cours.quimerch.com
+- API Documentation: https://gourmet.cours.quimerch.com/swagger/index.html
+
