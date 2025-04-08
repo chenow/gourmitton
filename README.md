@@ -6,7 +6,7 @@ A modern web application for managing your favorite recipes, built with Next.js,
 ![Nextjs Logo](https://img.shields.io/badge/Nextjs-000000?style=for-the-badge&logo=nextjs&logoColor=white)
 ![Docker Logo](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 
-![CI - Tests](https://github.com/chenow/gourmitton/actions/workflows/tests.yaml/badge.svg)
+![CI/CD](https://github.com/chenow/gourmitton/actions/workflows/deploy-and-test.yaml/badge.svg)
 
 
 ## ✨ Features
