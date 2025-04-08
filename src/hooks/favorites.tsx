@@ -16,7 +16,7 @@ export const useFavorites = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth-token")}`,
           },
-        }
+        },
       );
       console.log(response.data);
       if (!response.data) return [];
@@ -41,7 +41,7 @@ export const useAddFavorite = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth-token")}`,
           },
-        }
+        },
       );
       return response.data;
     },
@@ -68,7 +68,7 @@ export const useRemoveFavorite = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth-token")}`,
           },
-        }
+        },
       );
       return response.data;
     },

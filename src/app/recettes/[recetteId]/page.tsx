@@ -64,7 +64,7 @@ export default function RecettePage() {
           onError: () => {
             toast("Une erreur est survenue. Veuillez réessayer.");
           },
-        }
+        },
       );
     } else {
       // Ajouter aux favoris
@@ -80,7 +80,7 @@ export default function RecettePage() {
           onError: () => {
             toast("Une erreur est survenue. Veuillez réessayer.");
           },
-        }
+        },
       );
     }
     //@ts-expect-error - Fix this

@@ -41,7 +41,7 @@ export default function FavoritesPage() {
         onError: () => {
           toast("Failed to remove recipe from favorites");
         },
-      }
+      },
     );
   };
 

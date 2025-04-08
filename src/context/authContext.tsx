@@ -46,7 +46,7 @@ const getUser = async (setIsLoading: (isLoading: boolean) => void) => {
         "https://gourmet.cours.quimerch.com/me",
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setIsLoading(false);
       return response.data;
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         {
           username: username,
           password: password,
-        }
+        },
       );
       const data = response.data;
 

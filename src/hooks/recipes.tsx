@@ -8,7 +8,7 @@ export const useRecipes = () => {
     queryKey: ["recipes"],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/recipes`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/recipes`,
       );
       return response.data;
     },
@@ -21,7 +21,7 @@ export const useRecipe = (recipeId: string) => {
     queryKey: ["recipe", recipeId],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/recipes/${recipeId}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/recipes/${recipeId}`,
       );
       return response.data;
     },

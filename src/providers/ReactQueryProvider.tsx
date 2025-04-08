@@ -19,7 +19,7 @@ export default function ReactQueryProvider({
             retry: 1,
           },
         },
-      })
+      }),
   );
 
   return (
