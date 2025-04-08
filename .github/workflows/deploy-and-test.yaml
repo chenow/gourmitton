@@ -24,6 +24,9 @@ jobs:
       - name: Run ESLint
         run: bun run lint
 
+      - name: Run tests
+        run: bun test
+
       - name: Test build
         run: bun run build
 
