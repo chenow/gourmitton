@@ -106,6 +106,19 @@ Run lints with
 bun lint
 ```
 
+## 📦 Test
+
+Run tests with
+
+```bash
+bun test
+```
+
+Here is the test coverage report:
+
+![Test coverage report](test-coverage.png)
+
+
 ## 🌐 API Integration
 
 This application connects to the Gourmet API:
