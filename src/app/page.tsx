@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -9,36 +7,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useRecipes } from "@/hooks/recipes";
-import { Recipe } from "@/types";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
   const { data: recipes, isLoading, error } = useRecipes();
 
-  // Fonction pour extraire des tags à partir de la description (exemple simple)
-  const extractTags = (recipe: Recipe) => {
-    // Cette fonction est un exemple - vous pourriez vouloir implémenter une logique plus robuste
-    // pour extraire des tags cohérents ou avoir des tags réels dans votre API
-    const tags = [];
-
-    // Ajouter un tag basé sur when_to_eat
-    if (recipe.when_to_eat === "dish") tags.push("Plat principal");
-    if (recipe.when_to_eat === "dessert") tags.push("Dessert");
-
-    // Ajouter un tag basé sur le temps de préparation
-    if (recipe.prep_time + recipe.cook_time <= 15) tags.push("Rapide");
-    else if (recipe.prep_time + recipe.cook_time >= 30)
-      tags.push("Longue préparation");
-
-    // Vous pouvez ajouter d'autres logiques pour extraire des tags
-
-    return tags.length ? tags : ["Divers"];
-  };
-
   return (
     <div>
+      {/* Titre de la page */}
+      <div className="relative h-[300px] md:h-[400px] w-full">
+        <Image
+          src="/cuisine.webp"
+          alt="Cuisine banner"
+          fill
+          className="object-cover object-top"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent from-10% via-background/70 via-50% to-background to-100% flex flex-col justify-end">
+          <div className="container mx-auto px-4 pb-10">
+            <h1 className="text-4xl md:text-5xl font-bold drop-shadow-md">
+              Gourmitton
+            </h1>
+            <p className="text-xl md:text-2xl mt-2 max-w-xl drop-shadow-md">
+              Découvrez des recettes délicieuses et faciles à réaliser chez vous
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Titre de la page */}
       <div className="container mx-auto px-4 pt-8 pb-6">
         <h2 className="text-3xl font-bold text-foreground">
@@ -96,18 +93,6 @@ export default function HomePage() {
                     <p className="text-muted-foreground text-sm line-clamp-2">
                       {recipe.description}
                     </p>
-
-                    <div className="flex gap-2 mt-3">
-                      {extractTags(recipe).map((tag, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="text-xs"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
                   </CardContent>
 
                   <CardFooter className="flex justify-between text-sm text-muted-foreground">
